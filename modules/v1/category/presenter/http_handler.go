@@ -26,6 +26,7 @@ func NewHTTPHandler(CategoryUsecase usecase.CategoryUsecase) *HTTPCategoryHandle
 
 func (h *HTTPCategoryHandler) MountWorkField(group *echo.Group)  {
 	group.POST("/category", h.CreateCategory)
+	group.GET("/categories", h.GetAllCategories)
 }
 
 func (h *HTTPCategoryHandler) CreateCategory(c echo.Context) error  {
@@ -38,7 +39,7 @@ func (h *HTTPCategoryHandler) CreateCategory(c echo.Context) error  {
 
 	saveResult := h.CategoryUsecase.CreateCategory(reqData)
 	if saveResult.Error != nil {
-		err := fmt.Errorf("Gagal menambah data surat kerja")
+		err := fmt.Errorf("Gagal menambah data category")
 		log.Println(saveResult.Error.Error())
 		return c.JSON(http.StatusBadRequest, helper.ResponseDetailOutput(err.Error(), nil))
 	}
@@ -49,4 +50,15 @@ func (h *HTTPCategoryHandler) CreateCategory(c echo.Context) error  {
 		return c.JSON(http.StatusOK, helper.ResponseDetailOutput(err.Error(), data))
 	}
 	return c.JSON(http.StatusCreated, data)
+}
+
+func (h *HTTPCategoryHandler) GetAllCategories(c echo.Context) error {
+	categories := h.CategoryUsecase.GetAllCategories()
+	if categories.Error != nil {
+		err := fmt.Errorf("Gagal mendapatkan category")
+		log.Println(categories.Error.Error())
+		return c.JSON(http.StatusBadRequest, helper.ResponseDetailOutput(err.Error(), nil))
+	}
+	result, _ := categories.Result.(model.Categories)
+	return c.JSON(http.StatusOK, result)
 }

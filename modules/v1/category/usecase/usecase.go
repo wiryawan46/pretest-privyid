@@ -13,4 +13,5 @@ type ResultUseCase struct {
 
 type CategoryUsecase interface {
 	CreateCategory(param model.Category) ResultUseCase
+	GetAllCategories() ResultUseCase
 }
